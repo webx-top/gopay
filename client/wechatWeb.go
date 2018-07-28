@@ -11,7 +11,12 @@ import (
 
 var defaultWechatWebClient *WechatWebClient
 
-func InitWxWebClient(c *WechatWebClient) {
+func InitWxWebClient(env *common.WechatClientData) {
+	c := &WechatWebClient{Env: env}
+	if len(c.Env.PrivateKey) != 0 && len(c.Env.PublicKey) != 0 {
+		c.httpsClient = NewHTTPSClient(c.Env.PublicKey, c.Env.PrivateKey)
+	}
+
 	defaultWechatWebClient = c
 }
 
@@ -21,19 +26,15 @@ func DefaultWechatWebClient() *WechatWebClient {
 
 // WechatWebClient 微信公众号支付
 type WechatWebClient struct {
-	AppID       string       // 公众账号ID
-	MchID       string       // 商户号ID
-	Key         string       // 密钥
-	PrivateKey  []byte       // 私钥文件内容
-	PublicKey   []byte       // 公钥文件内容
+	Env         *common.WechatClientData
 	httpsClient *HTTPSClient // 双向证书链接
 }
 
 // Pay 支付
 func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, error) {
 	var m = make(map[string]string)
-	m["appid"] = this.AppID
-	m["mch_id"] = this.MchID
+	m["appid"] = this.Env.AppID
+	m["mch_id"] = this.Env.MchID
 	m["nonce_str"] = util.RandomStr()
 	m["body"] = TruncatedText(charge.Describe, 32)
 	m["out_trade_no"] = charge.TradeNum
@@ -44,7 +45,7 @@ func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, erro
 	m["openid"] = charge.OpenID
 	m["sign_type"] = "MD5"
 
-	sign, err := WechatGenSign(this.Key, m)
+	sign, err := WechatGenSign(this.Env.Key, m)
 	if err != nil {
 		return map[string]string{}, err
 	}
@@ -57,12 +58,12 @@ func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, erro
 	}
 
 	var c = make(map[string]string)
-	c["appId"] = this.AppID
+	c["appId"] = this.Env.AppID
 	c["timeStamp"] = fmt.Sprintf("%d", time.Now().Unix())
 	c["nonceStr"] = util.RandomStr()
 	c["package"] = fmt.Sprintf("prepay_id=%s", xmlRe.PrepayID)
 	c["signType"] = "MD5"
-	sign2, err := WechatGenSign(this.Key, c)
+	sign2, err := WechatGenSign(this.Env.Key, c)
 	if err != nil {
 		return map[string]string{}, errors.New("WechatWeb: " + err.Error())
 	}
@@ -73,18 +74,18 @@ func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, erro
 
 // 支付到用户的微信账号
 func (this *WechatWebClient) PayToClient(charge *common.Charge) (map[string]string, error) {
-	return WachatCompanyChange(this.AppID, this.MchID, this.Key, this.httpsClient, charge)
+	return WachatCompanyChange(this.Env.AppID, this.Env.MchID, this.Env.Key, this.httpsClient, charge)
 }
 
 // QueryOrder 查询订单
 func (this *WechatWebClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
 	var m = make(map[string]string)
-	m["appid"] = this.AppID
-	m["mch_id"] = this.MchID
+	m["appid"] = this.Env.AppID
+	m["mch_id"] = this.Env.MchID
 	m["out_trade_no"] = tradeNum
 	m["nonce_str"] = util.RandomStr()
 
-	sign, err := WechatGenSign(this.Key, m)
+	sign, err := WechatGenSign(this.Env.Key, m)
 	if err != nil {
 		return common.WeChatQueryResult{}, err
 	}

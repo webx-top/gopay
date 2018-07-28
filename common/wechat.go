@@ -1,5 +1,14 @@
 package common
 
+// WechatClientData 微信支付客户端环境
+type WechatClientData struct {
+	AppID      string // 公众账号ID
+	MchID      string // 商户号ID
+	Key        string // 密钥
+	PrivateKey []byte // 私钥文件内容
+	PublicKey  []byte // 公钥文件内容
+}
+
 // WeChatResult 微信支付返回
 type WeChatReResult struct {
 	PrepayID string `xml:"prepay_id" json:"prepay_id,omitempty"`

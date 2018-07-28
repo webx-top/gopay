@@ -10,7 +10,12 @@ import (
 
 var defaultWechatNativeClient *WechatNativeClient
 
-func InitWxNativeClient(c *WechatNativeClient) {
+func InitWxNativeClient(env *common.WechatClientData) {
+	c := &WechatNativeClient{Env: env}
+	if len(c.Env.PrivateKey) != 0 && len(c.Env.PublicKey) != 0 {
+		c.httpsClient = NewHTTPSClient(c.Env.PublicKey, c.Env.PrivateKey)
+	}
+
 	defaultWechatNativeClient = c
 }
 
@@ -18,21 +23,17 @@ func DefaultWechatNativeClient() *WechatNativeClient {
 	return defaultWechatNativeClient
 }
 
-// WechatNativeClient 微信公众号支付
+// WechatNativeClient 微信扫码支付
 type WechatNativeClient struct {
-	AppID       string       // 公众账号ID
-	MchID       string       // 商户号ID
-	Key         string       // 密钥
-	PrivateKey  []byte       // 私钥文件内容
-	PublicKey   []byte       // 公钥文件内容
+	Env         *common.WechatClientData
 	httpsClient *HTTPSClient // 双向证书链接
 }
 
 // Pay 支付
 func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, error) {
 	var m = make(map[string]string)
-	m["appid"] = this.AppID
-	m["mch_id"] = this.MchID
+	m["appid"] = this.Env.AppID
+	m["mch_id"] = this.Env.MchID
 	m["nonce_str"] = util.RandomStr()
 	m["body"] = TruncatedText(charge.Describe, 32)
 	m["out_trade_no"] = charge.TradeNum
@@ -43,7 +44,7 @@ func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, e
 	m["product_id"] = charge.ProductID
 	m["sign_type"] = "MD5"
 
-	sign, err := WechatGenSign(this.Key, m)
+	sign, err := WechatGenSign(this.Env.Key, m)
 	if err != nil {
 		return map[string]string{}, err
 	}
@@ -64,18 +65,18 @@ func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, e
 
 // 支付到用户的微信账号
 func (this *WechatNativeClient) PayToClient(charge *common.Charge) (map[string]string, error) {
-	return WachatCompanyChange(this.AppID, this.MchID, this.Key, this.httpsClient, charge)
+	return WachatCompanyChange(this.Env.AppID, this.Env.MchID, this.Env.Key, this.httpsClient, charge)
 }
 
 // QueryOrder 查询订单
 func (this *WechatNativeClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
 	var m = make(map[string]string)
-	m["appid"] = this.AppID
-	m["mch_id"] = this.MchID
+	m["appid"] = this.Env.AppID
+	m["mch_id"] = this.Env.MchID
 	m["out_trade_no"] = tradeNum
 	m["nonce_str"] = util.RandomStr()
 
-	sign, err := WechatGenSign(this.Key, m)
+	sign, err := WechatGenSign(this.Env.Key, m)
 	if err != nil {
 		return common.WeChatQueryResult{}, err
 	}
