@@ -5,11 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/milkbobo/gopay/client"
-	"github.com/milkbobo/gopay/common"
-	"github.com/milkbobo/gopay/constant"
 	"net/http"
 	"testing"
+
+	"github.com/fengzie/gopay/client"
+	"github.com/fengzie/gopay/common"
+	"github.com/fengzie/gopay/constant"
 )
 
 func TestPay(t *testing.T) {

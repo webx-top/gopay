@@ -9,18 +9,18 @@ import (
 	"github.com/fengzie/gopay/util"
 )
 
-var defaultWechatWebClient *WechatWebClient
+var defaultWechatNativeClient *WechatNativeClient
 
-func InitWxWebClient(c *WechatWebClient) {
-	defaultWechatWebClient = c
+func InitWxNativeClient(c *WechatNativeClient) {
+	defaultWechatNativeClient = c
 }
 
-func DefaultWechatWebClient() *WechatWebClient {
-	return defaultWechatWebClient
+func DefaultWechatNativeClient() *WechatNativeClient {
+	return defaultWechatNativeClient
 }
 
-// WechatWebClient 微信公众号支付
-type WechatWebClient struct {
+// WechatNativeClient 微信公众号支付
+type WechatNativeClient struct {
 	AppID       string       // 公众账号ID
 	MchID       string       // 商户号ID
 	Key         string       // 密钥
@@ -30,7 +30,7 @@ type WechatWebClient struct {
 }
 
 // Pay 支付
-func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, error) {
+func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, error) {
 	var m = make(map[string]string)
 	m["appid"] = this.AppID
 	m["mch_id"] = this.MchID
@@ -40,8 +40,8 @@ func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, erro
 	m["total_fee"] = WechatMoneyFeeToString(charge.MoneyFee)
 	m["spbill_create_ip"] = util.LocalIP()
 	m["notify_url"] = charge.CallbackURL
-	m["trade_type"] = "JSAPI"
-	m["openid"] = charge.OpenID
+	m["trade_type"] = "NATIVE"
+	m["product_id"] = charge.ProductID
 	m["sign_type"] = "MD5"
 
 	sign, err := WechatGenSign(this.Key, m)
@@ -64,7 +64,7 @@ func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, erro
 	c["signType"] = "MD5"
 	sign2, err := WechatGenSign(this.Key, c)
 	if err != nil {
-		return map[string]string{}, errors.New("WechatWeb: " + err.Error())
+		return map[string]string{}, errors.New("WechatNative: " + err.Error())
 	}
 	c["paySign"] = sign2
 
@@ -72,12 +72,12 @@ func (this *WechatWebClient) Pay(charge *common.Charge) (map[string]string, erro
 }
 
 // 支付到用户的微信账号
-func (this *WechatWebClient) PayToClient(charge *common.Charge) (map[string]string, error) {
+func (this *WechatNativeClient) PayToClient(charge *common.Charge) (map[string]string, error) {
 	return WachatCompanyChange(this.AppID, this.MchID, this.Key, this.httpsClient, charge)
 }
 
 // QueryOrder 查询订单
-func (this *WechatWebClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
+func (this *WechatNativeClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
 	var m = make(map[string]string)
 	m["appid"] = this.AppID
 	m["mch_id"] = this.MchID

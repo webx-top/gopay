@@ -3,9 +3,10 @@ package client
 import (
 	"errors"
 	"fmt"
-	"github.com/milkbobo/gopay/common"
-	"github.com/milkbobo/gopay/util"
 	"time"
+
+	"github.com/fengzie/gopay/common"
+	"github.com/fengzie/gopay/util"
 )
 
 var defaultWechatMiniProgramClient *WechatMiniProgramClient
