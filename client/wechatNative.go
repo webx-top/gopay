@@ -1,7 +1,6 @@
 package client
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -57,16 +56,8 @@ func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, e
 	}
 
 	var c = make(map[string]string)
-	c["appId"] = this.AppID
 	c["timeStamp"] = fmt.Sprintf("%d", time.Now().Unix())
-	c["nonceStr"] = util.RandomStr()
-	c["package"] = fmt.Sprintf("prepay_id=%s", xmlRe.PrepayID)
-	c["signType"] = "MD5"
-	sign2, err := WechatGenSign(this.Key, c)
-	if err != nil {
-		return map[string]string{}, errors.New("WechatNative: " + err.Error())
-	}
-	c["paySign"] = sign2
+	c["code_url"] = xmlRe.CodeURL
 
 	return c, nil
 }
