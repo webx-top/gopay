@@ -37,6 +37,9 @@ func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, e
 	m["nonce_str"] = util.RandomStr()
 	m["body"] = TruncatedText(charge.Describe, 32)
 	m["out_trade_no"] = charge.TradeNum
+	if charge.Attach != "" {
+		m["attach"] = charge.Attach
+	}
 	m["total_fee"] = WechatMoneyFeeToString(charge.MoneyFee)
 	m["spbill_create_ip"] = util.LocalIP()
 	m["notify_url"] = charge.CallbackURL
