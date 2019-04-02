@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fengzie/gopay/common"
-	"github.com/fengzie/gopay/util"
+	"github.com/feeeei/gopay/common"
+	"github.com/feeeei/gopay/util"
 )
 
 var defaultWechatAppClient *WechatAppClient

@@ -8,10 +8,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/fengzie/gopay"
-	"github.com/fengzie/gopay/client"
-	"github.com/fengzie/gopay/common"
-	"github.com/fengzie/gopay/constant"
+	"github.com/feeeei/gopay"
+	"github.com/feeeei/gopay/client"
+	"github.com/feeeei/gopay/common"
+	"github.com/feeeei/gopay/constant"
 	"net/http"
 )
 

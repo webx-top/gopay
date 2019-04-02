@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/fengzie/gopay/client"
-	"github.com/fengzie/gopay/common"
-	"github.com/fengzie/gopay/constant"
+	"github.com/feeeei/gopay/client"
+	"github.com/feeeei/gopay/common"
+	"github.com/feeeei/gopay/constant"
 )
 
 func TestPay(t *testing.T) {
