@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -67,7 +68,7 @@ xxxxxxxx
 		AppID:      "xxxxxxxxxxxx",
 		PrivateKey: privateKey.(*rsa.PrivateKey),
 		PublicKey:  publicKey.(*rsa.PublicKey),
-		PayURL:     "https://mapi.alipay.com/gateway.do",
+		//PayURL:     "https://mapi.alipay.com/gateway.do",
 	})
 }
 
@@ -101,13 +102,19 @@ xxxxxxxx
 
 func initHandle() {
 	http.HandleFunc("callback/aliappcallback", func(w http.ResponseWriter, r *http.Request) {
-		aliResult, err := AliAppCallback(w, r)
+		defer r.Body.Close()
+		b, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			fmt.Println(err)
-			//log.xxx
 			return
 		}
-		selfHandler(aliResult)
+		result, echo, err := AlipayCallback(&b)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		selfHandler(result)
+		w.Write([]byte(echo))
 	})
 }
 

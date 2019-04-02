@@ -1,13 +1,12 @@
 package gopay
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
 	"sort"
 	"strings"
-
-	"encoding/json"
 
 	"github.com/webx-top/gopay/client"
 	"github.com/webx-top/gopay/common"
@@ -16,14 +15,14 @@ import (
 
 func AlipayCallback(body *[]byte) (*common.AliPayResult, string, error) {
 	var m = make(map[string]string)
-	xml.Unmarshal(*body, m)
+	xml.Unmarshal(*body, &m)
 	var signSlice []string
 
 	for k, v := range m {
 		if k == "sign" || k == "sign_type" {
 			continue
 		}
-		signSlice = append(signSlice, fmt.Sprintf("%s=%s", k, v[0]))
+		signSlice = append(signSlice, fmt.Sprintf("%s=%s", k, v))
 	}
 	sort.Strings(signSlice)
 	signData := strings.Join(signSlice, "&")
@@ -41,7 +40,7 @@ func AlipayCallback(body *[]byte) (*common.AliPayResult, string, error) {
 	var aliPay common.AliPayResult
 	err = json.Unmarshal(mByte, &aliPay)
 	if err != nil {
-		return nil, "error", errors.New(fmt.Sprintf("m is %v, err is %v", m, err))
+		return nil, "error", fmt.Errorf("m is %v, err is %v", m, err)
 	}
 	return &aliPay, "SUCCESS", nil
 }
