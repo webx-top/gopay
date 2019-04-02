@@ -8,10 +8,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/feeeei/gopay"
-	"github.com/feeeei/gopay/client"
-	"github.com/feeeei/gopay/common"
-	"github.com/feeeei/gopay/constant"
+	"github.com/webx-top/gopay"
+	"github.com/webx-top/gopay/client"
+	"github.com/webx-top/gopay/common"
+	"github.com/webx-top/gopay/constant"
 	"net/http"
 )
 

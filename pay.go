@@ -3,9 +3,9 @@ package gopay
 import (
 	"errors"
 
-	"github.com/feeeei/gopay/client"
-	"github.com/feeeei/gopay/common"
-	"github.com/feeeei/gopay/constant"
+	"github.com/webx-top/gopay/client"
+	"github.com/webx-top/gopay/common"
+	"github.com/webx-top/gopay/constant"
 )
 
 // 用户下单支付接口

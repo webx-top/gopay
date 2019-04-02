@@ -9,9 +9,9 @@ import (
 
 	"encoding/json"
 
-	"github.com/feeeei/gopay/client"
-	"github.com/feeeei/gopay/common"
-	"github.com/feeeei/gopay/util"
+	"github.com/webx-top/gopay/client"
+	"github.com/webx-top/gopay/common"
+	"github.com/webx-top/gopay/util"
 )
 
 func AlipayCallback(body *[]byte) (*common.AliPayResult, string, error) {

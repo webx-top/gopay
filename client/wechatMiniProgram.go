@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/feeeei/gopay/common"
-	"github.com/feeeei/gopay/util"
+	"github.com/webx-top/gopay/common"
+	"github.com/webx-top/gopay/util"
 )
 
 var defaultWechatMiniProgramClient *WechatMiniProgramClient

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fengzie/gopay/common"
-	"github.com/fengzie/gopay/util"
+	"github.com/webx-top/gopay/common"
+	"github.com/webx-top/gopay/util"
 )
 
 var defaultWechatNativeClient *WechatNativeClient
