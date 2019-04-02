@@ -9,10 +9,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/milkbobo/gopay/client"
-	"github.com/milkbobo/gopay/common"
-	"github.com/milkbobo/gopay/util"
 	"encoding/json"
+
+	"github.com/fengzie/gopay/client"
+	"github.com/fengzie/gopay/common"
+	"github.com/fengzie/gopay/util"
 )
 
 func AliWebCallback(w http.ResponseWriter, r *http.Request) (*common.AliWebPayResult, error) {
@@ -132,7 +133,7 @@ func WeChatWebCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPa
 		signData = append(signData, fmt.Sprintf("%v=%v", k, v))
 	}
 
-	key := client.DefaultWechatAppClient().Key
+	key := client.DefaultWechatAppClient().Env.Key
 
 	mySign, err := client.WechatGenSign(key, m)
 	if err != nil {
@@ -188,7 +189,7 @@ func WeChatAppCallback(w http.ResponseWriter, r *http.Request) (*common.WeChatPa
 		signData = append(signData, fmt.Sprintf("%v=%v", k, v))
 	}
 
-	key := client.DefaultWechatAppClient().Key
+	key := client.DefaultWechatAppClient().Env.Key
 
 	mySign, err := client.WechatGenSign(key, m)
 	if err != nil {

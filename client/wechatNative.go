@@ -1,7 +1,6 @@
 package client
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -9,29 +8,29 @@ import (
 	"github.com/fengzie/gopay/util"
 )
 
-var defaultWechatMiniProgramClient *WechatMiniProgramClient
+var defaultWechatNativeClient *WechatNativeClient
 
-func InitWxMiniProgramClient(env *common.WechatClientData) {
-	c := &WechatMiniProgramClient{Env: env}
+func InitWxNativeClient(env *common.WechatClientData) {
+	c := &WechatNativeClient{Env: env}
 	if len(c.Env.PrivateKey) != 0 && len(c.Env.PublicKey) != 0 {
 		c.httpsClient = NewHTTPSClient(c.Env.PublicKey, c.Env.PrivateKey)
 	}
 
-	defaultWechatMiniProgramClient = c
+	defaultWechatNativeClient = c
 }
 
-func DefaultWechatMiniProgramClient() *WechatMiniProgramClient {
-	return defaultWechatMiniProgramClient
+func DefaultWechatNativeClient() *WechatNativeClient {
+	return defaultWechatNativeClient
 }
 
-// WechatMiniProgramClient 微信扫码支付
-type WechatMiniProgramClient struct {
+// WechatNativeClient 微信扫码支付
+type WechatNativeClient struct {
 	Env         *common.WechatClientData
 	httpsClient *HTTPSClient // 双向证书链接
 }
 
 // Pay 支付
-func (this *WechatMiniProgramClient) Pay(charge *common.Charge) (map[string]string, error) {
+func (this *WechatNativeClient) Pay(charge *common.Charge) (map[string]string, error) {
 	var m = make(map[string]string)
 	m["appid"] = this.Env.AppID
 	m["mch_id"] = this.Env.MchID
@@ -44,8 +43,8 @@ func (this *WechatMiniProgramClient) Pay(charge *common.Charge) (map[string]stri
 	m["total_fee"] = WechatMoneyFeeToString(charge.MoneyFee)
 	m["spbill_create_ip"] = util.LocalIP()
 	m["notify_url"] = charge.CallbackURL
-	m["trade_type"] = "JSAPI"
-	m["openid"] = charge.OpenID
+	m["trade_type"] = "NATIVE"
+	m["product_id"] = charge.ProductID
 	m["sign_type"] = "MD5"
 
 	sign, err := WechatGenSign(this.Env.Key, m)
@@ -61,27 +60,19 @@ func (this *WechatMiniProgramClient) Pay(charge *common.Charge) (map[string]stri
 	}
 
 	var c = make(map[string]string)
-	c["appId"] = this.Env.AppID
 	c["timeStamp"] = fmt.Sprintf("%d", time.Now().Unix())
-	c["nonceStr"] = util.RandomStr()
-	c["package"] = fmt.Sprintf("prepay_id=%s", xmlRe.PrepayID)
-	c["signType"] = "MD5"
-	sign2, err := WechatGenSign(this.Env.Key, c)
-	if err != nil {
-		return map[string]string{}, errors.New("WechatWeb: " + err.Error())
-	}
-	c["paySign"] = sign2
-	delete(c, "appId")
+	c["code_url"] = xmlRe.CodeURL
+
 	return c, nil
 }
 
 // 支付到用户的微信账号
-func (this *WechatMiniProgramClient) PayToClient(charge *common.Charge) (map[string]string, error) {
+func (this *WechatNativeClient) PayToClient(charge *common.Charge) (map[string]string, error) {
 	return WachatCompanyChange(this.Env.AppID, this.Env.MchID, this.Env.Key, this.httpsClient, charge)
 }
 
 // QueryOrder 查询订单
-func (this *WechatMiniProgramClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
+func (this *WechatNativeClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
 	var m = make(map[string]string)
 	m["appid"] = this.Env.AppID
 	m["mch_id"] = this.Env.MchID

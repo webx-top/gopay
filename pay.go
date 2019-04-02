@@ -2,9 +2,10 @@ package gopay
 
 import (
 	"errors"
-	"github.com/milkbobo/gopay/client"
-	"github.com/milkbobo/gopay/common"
-	"github.com/milkbobo/gopay/constant"
+
+	"github.com/fengzie/gopay/client"
+	"github.com/fengzie/gopay/common"
+	"github.com/fengzie/gopay/constant"
 )
 
 // 用户下单支付接口
@@ -53,6 +54,8 @@ func getPayType(payMethod int64) common.PayClient {
 		return client.DefaultWechatWebClient()
 	case constant.WECHAT_APP:
 		return client.DefaultWechatAppClient()
+	case constant.WECHAT_NATIVE:
+		return client.DefaultWechatNativeClient()
 	case constant.WECHAT_MINI_PROGRAM:
 		return client.DefaultWechatMiniProgramClient()
 	}
