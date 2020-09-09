@@ -78,25 +78,20 @@ func (this *WechatAppClient) Pay(charge *common.Charge) (map[string]string, erro
 	return c, nil
 }
 
+// 关闭订单
+func (this *WechatAppClient) CloseOrder(outTradeNo string) (common.WeChatQueryResult, error) {
+	return WachatCloseOrder(this.AppID, this.MchID, this.Key, outTradeNo)
+}
+
 // 支付到用户的微信账号
 func (this *WechatAppClient) PayToClient(charge *common.Charge) (map[string]string, error) {
-	return WachatCompanyChange(this.Env.AppID, this.Env.MchID, this.Env.Key, this.httpsClient, charge)
+
+	this.httpsClient = NewHTTPSClient(this.PublicKey, this.PrivateKey)
+
+	return WachatCompanyChange(this.AppID, this.MchID, this.Key, this.httpsClient, charge)
 }
 
 // QueryOrder 查询订单
 func (this *WechatAppClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
-	var m = make(map[string]string)
-	m["appid"] = this.Env.AppID
-	m["mch_id"] = this.Env.MchID
-	m["out_trade_no"] = tradeNum
-	m["nonce_str"] = util.RandomStr()
-
-	sign, err := WechatGenSign(this.Env.Key, m)
-	if err != nil {
-		return common.WeChatQueryResult{}, err
-	}
-
-	m["sign"] = sign
-
-	return PostWechat("https://api.mch.weixin.qq.com/pay/orderquery", m, nil)
+	return WachatQueryOrder(this.AppID, this.MchID, this.Key, tradeNum)
 }

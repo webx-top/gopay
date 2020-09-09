@@ -33,8 +33,12 @@ type WechatMiniProgramClient struct {
 // Pay 支付
 func (this *WechatMiniProgramClient) Pay(charge *common.Charge) (map[string]string, error) {
 	var m = make(map[string]string)
-	m["appid"] = this.Env.AppID
-	m["mch_id"] = this.Env.MchID
+	appId := this.AppID
+	if charge.APPID != "" {
+		appId = charge.APPID
+	}
+	m["appid"] = appId
+	m["mch_id"] = this.MchID
 	m["nonce_str"] = util.RandomStr()
 	m["body"] = TruncatedText(charge.Describe, 32)
 	m["out_trade_no"] = charge.TradeNum
@@ -61,7 +65,7 @@ func (this *WechatMiniProgramClient) Pay(charge *common.Charge) (map[string]stri
 	}
 
 	var c = make(map[string]string)
-	c["appId"] = this.Env.AppID
+	c["appId"] = appId
 	c["timeStamp"] = fmt.Sprintf("%d", time.Now().Unix())
 	c["nonceStr"] = util.RandomStr()
 	c["package"] = fmt.Sprintf("prepay_id=%s", xmlRe.PrepayID)
@@ -75,6 +79,11 @@ func (this *WechatMiniProgramClient) Pay(charge *common.Charge) (map[string]stri
 	return c, nil
 }
 
+// 关闭订单
+func (this *WechatMiniProgramClient) CloseOrder(outTradeNo string) (common.WeChatQueryResult, error) {
+	return WachatCloseOrder(this.AppID, this.MchID, this.Key, outTradeNo)
+}
+
 // 支付到用户的微信账号
 func (this *WechatMiniProgramClient) PayToClient(charge *common.Charge) (map[string]string, error) {
 	return WachatCompanyChange(this.Env.AppID, this.Env.MchID, this.Env.Key, this.httpsClient, charge)
@@ -82,18 +91,5 @@ func (this *WechatMiniProgramClient) PayToClient(charge *common.Charge) (map[str
 
 // QueryOrder 查询订单
 func (this *WechatMiniProgramClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
-	var m = make(map[string]string)
-	m["appid"] = this.Env.AppID
-	m["mch_id"] = this.Env.MchID
-	m["out_trade_no"] = tradeNum
-	m["nonce_str"] = util.RandomStr()
-
-	sign, err := WechatGenSign(this.Env.Key, m)
-	if err != nil {
-		return common.WeChatQueryResult{}, err
-	}
-
-	m["sign"] = sign
-
-	return PostWechat("https://api.mch.weixin.qq.com/pay/orderquery", m, nil)
+	return WachatQueryOrder(this.AppID, this.MchID, this.Key, tradeNum)
 }

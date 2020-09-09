@@ -26,7 +26,7 @@ func AlipayCallback(body *[]byte) (*common.AliPayResult, string, error) {
 	}
 	sort.Strings(signSlice)
 	signData := strings.Join(signSlice, "&")
-	if m["sign_type"] != "RSA" {
+	if m["sign_type"] != "RSA2" {
 		return nil, "error", errors.New("签名类型未知")
 	}
 
