@@ -1,7 +1,7 @@
-package common
+package alipay
 
-// AliPayResult 支付宝支付结果回调
-type AliPayResult struct {
+// PayResult 支付宝支付结果回调
+type PayResult struct {
 	NotifyTime       string `json:"notify_time"`
 	NotifyType       string `json:"notify_type"`
 	NotifyID         string `json:"notify_id"`
@@ -32,7 +32,7 @@ type AliPayResult struct {
 	UseCoupon        string `json:"use_coupon"`
 	RefundStatus     string `json:"refund_status"`
 	GmtRefund        string `json:"gmt_refund"`
-	AliQueryResult
+	QueryResult
 }
 
 type FundBill struct {
@@ -40,7 +40,7 @@ type FundBill struct {
 	Amount      string `json:"amount"`
 }
 
-type AliQueryResult struct {
+type QueryResult struct {
 	TradeNo             string     `json:"trade_no"`
 	OutTradeNo          string     `json:"out_trade_no"`
 	OpenID              string     `json:"open_id"`
@@ -64,7 +64,7 @@ type AliQueryResult struct {
 	PassbackParams      string     `json:"passback_params"`
 }
 
-type AliWebQueryResult struct {
+type WebQueryResult struct {
 	IsSuccess string `xml:"is_success"`
 	ErrorMsg  string `xml:"error"`
 	SignType  string `xml:"sign_type"`
@@ -90,8 +90,8 @@ type AliWebQueryResult struct {
 	} `xml:"response"`
 }
 
-type AliWebAppQueryResult struct {
-	AlipayTradeQueryResponse struct {
+type AppQueryResult struct {
+	TradeQueryResponse struct {
 		Code                string `json:"code"`
 		Msg                 string `json:"msg"`
 		SubCode             string `json:"sub_code"`

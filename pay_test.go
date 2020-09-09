@@ -9,21 +9,20 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/webx-top/gopay/client"
+	"github.com/webx-top/gopay/client/alipay"
+	"github.com/webx-top/gopay/client/wechat"
 	"github.com/webx-top/gopay/common"
-	"github.com/webx-top/gopay/constant"
 )
 
 func TestPay(t *testing.T) {
 	initClient()
 	initHandle()
 	charge := new(common.Charge)
-	charge.PayMethod = constant.ALI_WEB
+	charge.PayMethod = `alipay.web`
 	charge.MoneyFee = 1
 	charge.Describe = "test pay"
 	charge.TradeNum = "11111111122"
 	charge.CallbackURL = "http://127.0.0.1/callback/aliappcallback"
-	// charge.PayURL = "https://openapi.alipaydev.com/gateway.do"
 
 	fdata, err := Pay(charge)
 	if err != nil {
@@ -62,43 +61,41 @@ xxxxxxxx
 		panic(err)
 	}
 
-	client.InitAliWebClient(&client.AliWebClient{
-		PartnerID:  "xxxxxxxxxxxx",
-		SellerID:   "xxxxxxxxxxxx",
-		AppID:      "xxxxxxxxxxxx",
-		PrivateKey: privateKey.(*rsa.PrivateKey),
-		PublicKey:  publicKey.(*rsa.PublicKey),
-		//PayURL:     "https://mapi.alipay.com/gateway.do",
-	})
+	web := alipay.NewWeb()
+	web.PartnerID = "xxxxxxxxxxxx"
+	web.SellerID = "xxxxxxxxxxxx"
+	web.AppID = "xxxxxxxxxxxx"
+	web.PrivateKey = privateKey.(*rsa.PrivateKey)
+	web.PublicKey = publicKey.(*rsa.PublicKey)
+	alipay.InitWeb(web)
 }
 
-//func TestPay(t *testing.T) {
-//	initClient()
-//	initHandle()
-//	charge := new(common.Charge)
-//	charge.PayMethod = constant.WECHAT_WEB
-//	charge.MoneyFee = 1
-//	charge.Describe = "test pay"
-//	charge.TradeNum = "11111111122"
-//	charge.CallbackURL = "http://127.0.0.1/callback/aliappcallback"
-//	charge.OpenID = "123"
-//
-//	fdata, err := Pay(charge)
-//	if err != nil {
-//		t.Error(err)
-//	}
-//	fmt.Printf("%+v", fdata)
-//}
-//
-//func initClient() {
-//	client.InitWxWebClient(&client.WechatWebClient{
-//		AppID:       "xxxxxxxxxxxx",
-//		MchID:       "xxxxxxxxxxxx",
-//		Key:         "xxxxxxxxxxxx",
-//		CallbackURL: "127.0.0.1/weixin/paycallback",
-//		PayURL:      "https://api.mch.weixin.qq.com/pay/unifiedorder",
-//	})
-//}
+func TestWechatPay(t *testing.T) {
+	initWechatClient()
+	initHandle()
+	charge := new(common.Charge)
+	charge.PayMethod = `wechat.web`
+	charge.MoneyFee = 1
+	charge.Describe = "test pay"
+	charge.TradeNum = "11111111122"
+	charge.CallbackURL = "http://127.0.0.1/callback/aliappcallback"
+	charge.OpenID = "123"
+
+	fdata, err := Pay(charge)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Printf("%+v", fdata)
+}
+
+func initWechatClient() {
+	wechat.InitWeb(&wechat.ClientData{
+		AppID:  "xxxxxxxxxxxx",
+		MchID:  "xxxxxxxxxxxx",
+		Key:    "xxxxxxxxxxxx",
+		PayURL: "https://api.mch.weixin.qq.com/pay/unifiedorder",
+	})
+}
 
 func initHandle() {
 	http.HandleFunc("callback/aliappcallback", func(w http.ResponseWriter, r *http.Request) {
@@ -108,7 +105,7 @@ func initHandle() {
 			fmt.Println(err)
 			return
 		}
-		result, echo, err := AlipayCallback(&b)
+		result, echo, err := alipay.Callback(&b)
 		if err != nil {
 			fmt.Println(err)
 			return

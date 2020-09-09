@@ -1,54 +1,17 @@
-package gopay
+package wechat
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"sort"
-	"strings"
 
-	"github.com/webx-top/gopay/client"
-	"github.com/webx-top/gopay/common"
 	"github.com/webx-top/gopay/util"
 )
 
-func AlipayCallback(body *[]byte) (*common.AliPayResult, string, error) {
-	var m = make(map[string]string)
-	xml.Unmarshal(*body, &m)
-	var signSlice []string
-
-	for k, v := range m {
-		if k == "sign" || k == "sign_type" {
-			continue
-		}
-		signSlice = append(signSlice, fmt.Sprintf("%s=%s", k, v))
-	}
-	sort.Strings(signSlice)
-	signData := strings.Join(signSlice, "&")
-	if m["sign_type"] != "RSA2" {
-		return nil, "error", errors.New("签名类型未知")
-	}
-
-	client.DefaultAliAppClient().CheckSign(signData, m["sign"])
-
-	mByte, err := json.Marshal(m)
-	if err != nil {
-		return nil, "error", errors.New("error")
-	}
-
-	var aliPay common.AliPayResult
-	err = json.Unmarshal(mByte, &aliPay)
-	if err != nil {
-		return nil, "error", fmt.Errorf("m is %v, err is %v", m, err)
-	}
-	return &aliPay, "SUCCESS", nil
-}
-
-func WeChatCallback(body *[]byte) (*common.WeChatPayResult, string, error) {
+func Callback(body *[]byte) (*PayResult, string, error) {
 	var returnCode = "FAIL"
 	var returnMsg = ""
-	var reXML common.WeChatPayResult
+	var reXML PayResult
 
 	err := xml.Unmarshal(*body, &reXML)
 	if err != nil {
@@ -70,9 +33,9 @@ func WeChatCallback(body *[]byte) (*common.WeChatPayResult, string, error) {
 		signData = append(signData, fmt.Sprintf("%v=%v", k, v))
 	}
 
-	key := client.DefaultWechatAppClient().Env.Key
+	key := DefaultApp().Key
 
-	mySign, err := client.WechatGenSign(key, m)
+	mySign, err := GenSign(key, m)
 	if err != nil {
 		returnMsg = "签名失败"
 		return &reXML, handleWechatCallbackResponse(returnCode, returnMsg), err

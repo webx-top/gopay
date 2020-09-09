@@ -14,7 +14,7 @@ type Charge struct {
 	TradeNum    string  `json:"tradeNum,omitempty"`
 	Origin      string  `json:"origin,omitempty"`
 	UserID      string  `json:"userId,omitempty"`
-	PayMethod   int64   `json:"payMethod,omitempty"`
+	PayMethod   string  `json:"payMethod,omitempty"`
 	MoneyFee    float64 `json:"MoneyFee,omitempty"`
 	CallbackURL string  `json:"callbackURL,omitempty"`
 	ReturnURL   string  `json:"returnURL,omitempty"`

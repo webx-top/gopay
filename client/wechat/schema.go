@@ -1,7 +1,7 @@
-package common
+package wechat
 
-// WechatClientData 微信支付客户端环境
-type WechatClientData struct {
+// ClientData 微信支付客户端环境
+type ClientData struct {
 	AppID             string // 公众账号ID
 	MchID             string // 商户号ID
 	Key               string // 密钥
@@ -11,20 +11,20 @@ type WechatClientData struct {
 	SandBoxGetSignURL string
 }
 
-// WeChatResult 微信支付返回
-type WeChatReResult struct {
+// ReResult 微信支付返回
+type ReResult struct {
 	PrepayID string `xml:"prepay_id" json:"prepay_id,omitempty"`
 	CodeURL  string `xml:"code_url" json:"code_url,omitempty"`
 }
 
-// WechatBaseResult 基本信息
-type WechatBaseResult struct {
+// BaseResult 基本信息
+type BaseResult struct {
 	ReturnCode string `xml:"return_code" json:"return_code,omitempty"`
 	ReturnMsg  string `xml:"return_msg" json:"return_msg,omitempty"`
 }
 
-// WechatReturnData 返回通用数据
-type WechatReturnData struct {
+// ReturnData 返回通用数据
+type ReturnData struct {
 	AppID      string `xml:"appid,omitempty" json:"appid,omitempty"`
 	MchID      string `xml:"mch_id,omitempty" json:"mch_id,omitempty"`
 	MchAppid   string `xml:"mch_appid,omitempty" json:"mch_appid,omitempty"`
@@ -36,8 +36,8 @@ type WechatReturnData struct {
 	ErrCodeDes string `xml:"err_code_des,omitempty" json:"err_code_des,omitempty"`
 }
 
-// WechatResultData 结果通用数据
-type WechatResultData struct {
+// ResultData 结果通用数据
+type ResultData struct {
 	OpenID         string `xml:"openid,omitempty" json:"openid,omitempty"`
 	IsSubscribe    string `xml:"is_subscribe,omitempty" json:"is_subscribe,omitempty"`
 	TradeType      string `xml:"trade_type,omitempty" json:"trade_type,omitempty"`
@@ -56,17 +56,17 @@ type WechatResultData struct {
 	DetailId       string `xml:"detail_id,omitempty" json:"detail_id,omitempty"`
 }
 
-type WeChatPayResult struct {
-	WechatBaseResult
-	WechatReturnData
-	WechatResultData
+type PayResult struct {
+	BaseResult
+	ReturnData
+	ResultData
 }
 
-type WeChatQueryResult struct {
-	WechatBaseResult
-	WeChatReResult
-	WechatReturnData
-	WechatResultData
+type QueryResult struct {
+	BaseResult
+	ReResult
+	ReturnData
+	ResultData
 	TradeState     string `xml:"trade_state" json:"trade_state,omitempty"`
 	TradeStateDesc string `xml:"trade_state_desc" json:"trade_state_desc,omitempty"`
 }
