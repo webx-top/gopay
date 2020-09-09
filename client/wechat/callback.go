@@ -8,7 +8,7 @@ import (
 	"github.com/webx-top/gopay/util"
 )
 
-func (c *ClientData) Callback(body *[]byte) (*PayResult, string, error) {
+func (c *ClientData) Callback(body *[]byte) (interface{}, string, error) {
 	var returnCode = "FAIL"
 	var returnMsg string
 	var reXML PayResult
@@ -16,12 +16,12 @@ func (c *ClientData) Callback(body *[]byte) (*PayResult, string, error) {
 	err := xml.Unmarshal(*body, &reXML)
 	if err != nil {
 		returnMsg = "参数错误"
-		return nil, handleWechatCallbackResponse(returnCode, returnMsg), err
+		return reXML, handleWechatCallbackResponse(returnCode, returnMsg), err
 	}
 
 	if reXML.ReturnCode != "SUCCESS" {
 		returnMsg = "支付失败"
-		return &reXML, handleWechatCallbackResponse(returnCode, returnMsg), errors.New(reXML.ReturnCode)
+		return reXML, handleWechatCallbackResponse(returnCode, returnMsg), errors.New(reXML.ReturnCode)
 	}
 	m := util.XmlToMap(*body)
 
@@ -38,16 +38,16 @@ func (c *ClientData) Callback(body *[]byte) (*PayResult, string, error) {
 	mySign, err := GenSign(key, m)
 	if err != nil {
 		returnMsg = "签名失败"
-		return &reXML, handleWechatCallbackResponse(returnCode, returnMsg), err
+		return reXML, handleWechatCallbackResponse(returnCode, returnMsg), err
 	}
 
 	if mySign != m["sign"] {
 		returnMsg = "签名失败"
-		return &reXML, handleWechatCallbackResponse(returnCode, returnMsg), errors.New(returnMsg)
+		return reXML, handleWechatCallbackResponse(returnCode, returnMsg), errors.New(returnMsg)
 	}
 
 	returnCode = "SUCCESS"
-	return &reXML, handleWechatCallbackResponse(returnCode, returnMsg), nil
+	return reXML, handleWechatCallbackResponse(returnCode, returnMsg), nil
 }
 
 func handleWechatCallbackResponse(returnCode string, returnMsg string) string {

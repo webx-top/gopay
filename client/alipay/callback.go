@@ -9,10 +9,11 @@ import (
 	"strings"
 )
 
-func (c *PayClient) Callback(body *[]byte) (*PayResult, string, error) {
+func (c *PayClient) Callback(body *[]byte) (interface{}, string, error) {
+	var aliPay PayResult
 	var m = make(map[string]string)
 	if err := xml.Unmarshal(*body, &m); err != nil {
-		return nil, "", err
+		return aliPay, "", err
 	}
 	var signSlice []string
 
@@ -25,20 +26,19 @@ func (c *PayClient) Callback(body *[]byte) (*PayResult, string, error) {
 	sort.Strings(signSlice)
 	signData := strings.Join(signSlice, "&")
 	if m["sign_type"] != "RSA2" {
-		return nil, "error", errors.New("签名类型未知")
+		return aliPay, "error", errors.New("签名类型未知")
 	}
 
 	c.CheckSign(signData, m["sign"])
 
 	mByte, err := json.Marshal(m)
 	if err != nil {
-		return nil, "error", errors.New("error")
+		return aliPay, "error", errors.New("error")
 	}
 
-	var aliPay PayResult
 	err = json.Unmarshal(mByte, &aliPay)
 	if err != nil {
-		return nil, "error", fmt.Errorf("m is %v, err is %v", m, err)
+		return aliPay, "error", fmt.Errorf("m is %v, err is %v", m, err)
 	}
-	return &aliPay, "SUCCESS", nil
+	return aliPay, "SUCCESS", nil
 }

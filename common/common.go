@@ -2,10 +2,12 @@ package common
 
 // PayClient 支付客户端接口
 type PayClient interface {
-	// 用户下单付款
+	// Pay 用户下单付款
 	Pay(charge *Charge) (map[string]string, error)
-	// 付款给用户
+	// PayToClient 付款给用户
 	PayToClient(charge *Charge) (map[string]string, error)
+	// Callback 支付回调
+	Callback(body *[]byte) (result interface{}, resp string, err error)
 }
 
 // Charge 支付参数
