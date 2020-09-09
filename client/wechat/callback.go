@@ -8,9 +8,9 @@ import (
 	"github.com/webx-top/gopay/util"
 )
 
-func Callback(body *[]byte) (*PayResult, string, error) {
+func (c *ClientData) Callback(body *[]byte) (*PayResult, string, error) {
 	var returnCode = "FAIL"
-	var returnMsg = ""
+	var returnMsg string
 	var reXML PayResult
 
 	err := xml.Unmarshal(*body, &reXML)
@@ -33,7 +33,7 @@ func Callback(body *[]byte) (*PayResult, string, error) {
 		signData = append(signData, fmt.Sprintf("%v=%v", k, v))
 	}
 
-	key := DefaultApp().Key
+	key := c.Key
 
 	mySign, err := GenSign(key, m)
 	if err != nil {

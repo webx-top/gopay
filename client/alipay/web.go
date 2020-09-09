@@ -3,7 +3,6 @@ package alipay
 import (
 	"crypto"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
@@ -103,22 +102,4 @@ func (a *Web) GenSign(m map[string]string) string {
 		panic(err)
 	}
 	return url.QueryEscape(base64.StdEncoding.EncodeToString(signByte))
-}
-
-// CheckSign 检测签名
-func (a *Web) CheckSign(signData, sign string) {
-	signByte, err := base64.StdEncoding.DecodeString(sign)
-	if err != nil {
-		panic(err)
-	}
-	s := sha1.New()
-	_, err = s.Write([]byte(signData))
-	if err != nil {
-		panic(err)
-	}
-	hash := s.Sum(nil)
-	err = rsa.VerifyPKCS1v15(a.PublicKey, crypto.SHA1, hash, signByte)
-	if err != nil {
-		panic(err)
-	}
 }

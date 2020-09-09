@@ -9,9 +9,11 @@ import (
 	"strings"
 )
 
-func Callback(body *[]byte) (*PayResult, string, error) {
+func (c *PayClient) Callback(body *[]byte) (*PayResult, string, error) {
 	var m = make(map[string]string)
-	xml.Unmarshal(*body, &m)
+	if err := xml.Unmarshal(*body, &m); err != nil {
+		return nil, "", err
+	}
 	var signSlice []string
 
 	for k, v := range m {
@@ -26,7 +28,7 @@ func Callback(body *[]byte) (*PayResult, string, error) {
 		return nil, "error", errors.New("签名类型未知")
 	}
 
-	DefaultApp().CheckSign(signData, m["sign"])
+	c.CheckSign(signData, m["sign"])
 
 	mByte, err := json.Marshal(m)
 	if err != nil {

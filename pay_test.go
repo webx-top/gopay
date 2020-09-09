@@ -105,7 +105,7 @@ func initHandle() {
 			fmt.Println(err)
 			return
 		}
-		result, echo, err := alipay.Callback(&b)
+		result, echo, err := alipay.DefaultWeb().Callback(&b)
 		if err != nil {
 			fmt.Println(err)
 			return

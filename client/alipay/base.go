@@ -57,18 +57,18 @@ func (a *PayClient) PayToClient(charge *common.Charge) (map[string]string, error
 
 	bizContent["remark"] = client.TruncatedText(charge.Describe, 32)
 
-	bizContentJson, err := json.Marshal(bizContent)
+	bizContentJSON, err := json.Marshal(bizContent)
 	if err != nil {
 		return result, errors.New("json.Marshal: " + err.Error())
 	}
-	m["biz_content"] = string(bizContentJson)
+	m["biz_content"] = string(bizContentJSON)
 
 	m["sign"] = a.GenSign(m)
 
-	requestUrl := fmt.Sprintf("%s?%s", a.OpenAPIURL, a.ToURL(m))
+	requestURL := fmt.Sprintf("%s?%s", a.OpenAPIURL, a.ToURL(m))
 
 	var resp map[string]interface{}
-	bytes, err := client.HTTPSC.GetData(requestUrl)
+	bytes, err := client.HTTPSC.GetData(requestURL)
 	if err != nil {
 		return result, err
 	}
@@ -79,7 +79,7 @@ func (a *PayClient) PayToClient(charge *common.Charge) (map[string]string, error
 
 	result, ok := resp["alipay_fund_trans_toaccount_transfer_response"].(map[string]string)
 	if !ok {
-		return result, errors.New(fmt.Sprintf("返回结果错误:%s", resp))
+		return result, fmt.Errorf("返回结果错误:%s", resp)
 	}
 
 	return result, nil
@@ -152,7 +152,6 @@ func (a *PayClient) getCrypto() crypto.Hash {
 		return crypto.SHA256
 	}
 	return crypto.SHA1
-
 }
 
 func (a *PayClient) getHash(rasType string) hash.Hash {
