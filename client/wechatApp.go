@@ -80,18 +80,18 @@ func (this *WechatAppClient) Pay(charge *common.Charge) (map[string]string, erro
 
 // 关闭订单
 func (this *WechatAppClient) CloseOrder(outTradeNo string) (common.WeChatQueryResult, error) {
-	return WachatCloseOrder(this.AppID, this.MchID, this.Key, outTradeNo)
+	return WachatCloseOrder(this.Env.AppID, this.Env.MchID, this.Env.Key, outTradeNo)
 }
 
 // 支付到用户的微信账号
 func (this *WechatAppClient) PayToClient(charge *common.Charge) (map[string]string, error) {
 
-	this.httpsClient = NewHTTPSClient(this.PublicKey, this.PrivateKey)
+	this.httpsClient = NewHTTPSClient(this.Env.PublicKey, this.Env.PrivateKey)
 
-	return WachatCompanyChange(this.AppID, this.MchID, this.Key, this.httpsClient, charge)
+	return WachatCompanyChange(this.Env.AppID, this.Env.MchID, this.Env.Key, this.httpsClient, charge)
 }
 
 // QueryOrder 查询订单
 func (this *WechatAppClient) QueryOrder(tradeNum string) (common.WeChatQueryResult, error) {
-	return WachatQueryOrder(this.AppID, this.MchID, this.Key, tradeNum)
+	return WachatQueryOrder(this.Env.AppID, this.Env.MchID, this.Env.Key, tradeNum)
 }

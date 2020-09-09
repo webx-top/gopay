@@ -59,9 +59,9 @@ func (this *AliAppClient) CloseOrder(charge *common.Charge) (map[string]string, 
 	return map[string]string{}, errors.New("暂未开发该功能")
 }
 
-//func (this *AliAppClient) PayToClient(charge *common.Charge) (map[string]string, error) {
-//	return map[string]string{}, errors.New("暂未开发该功能")
-//}
+func (this *AliAppClient) PayToClient(charge *common.Charge) (map[string]string, error) {
+	return map[string]string{}, errors.New("暂未开发该功能")
+}
 
 // 订单查询
 func (this *AliAppClient) QueryOrder(outTradeNo string) (common.AliWebAppQueryResult, error) {
